@@ -1,5 +1,6 @@
 #pragma once
 #include "mask_generated.hpp"
+#include "frame_meter.hpp"
 #include "lighting_capture.hpp"
 #include "same_draw.hpp"
 #include "world_filter.hpp"
@@ -259,6 +260,7 @@ inline HRESULT STDMETHODCALLTYPE indexed(IDirect3DDevice9* device, D3DPRIMITIVET
 
 inline HRESULT STDMETHODCALLTYPE present(IDirect3DDevice9* device, const RECT* src, const RECT* dst,
                                           HWND window, const RGNDATA* dirty) {
+    if (device == renderer) frame_meter::tick();
     const bool previous_city_filter = world_filter::selected;
     if (city_probe::enabled && device == renderer) city_probe::before_present(device);
     world_filter::filtered_draws = 0;

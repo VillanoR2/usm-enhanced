@@ -36,7 +36,8 @@ solo trae inglés).
   usa el cargador para asignar clases, 0x4CB45E) y los operandos de dibujo
   0x53D1B2, 0x51E8B9, 0x51E8E6 y 0x53A2E7 apuntan a copias escaladas.
 - Distancia de malla 167 (0x88A430, 0x53CF0A, 0x53D381) y radio 167²
-  (0x88A46C) escalados; tope x7.
+  (0x88A46C) escalados; tope x6 (el antiguo perfil Ultra, x7 con 32 peatones y
+  55 coches, podía dejar parada la carga de una partida nueva).
 - Fundido: 0x53D1B6 (fundido fijo de 10 unidades) pasa a ser proporcional,
   `clamp(0.25·L, 10, 150)`.
 - Zonas residentes 8 → 32 (0x921E40, 0x9222D4+0x10, 0x55544C), ranuras de

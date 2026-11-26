@@ -6,7 +6,7 @@
 //
 // usm_mod.ini (next to USM.exe):
 //   [Graficos]
-//   DistanciaDibujado=6.0   ; 1.0 = original, max 7.0
+//   DistanciaDibujado=6.0   ; 1.0 = original, max 6.0
 // The environment variable USM_PC_DRAW_DISTANCE overrides the file.
 
 extern "C" int _fltused;
@@ -79,24 +79,33 @@ inline float applied_scale = 1.0f;
 // City objects fade out over the last 10 units before their distance class L
 // (0x53D1B6: start = min(L, X - 10), alpha = 1 - (d - start) * 0.1). Designed
 // for the stock distances; at x6 the fade is ~1% of the distance and reads as
-// popping. Make it proportional: length = clamp(L * 0.25, 10, 150).
-inline float fade_fraction = 0.25f, fade_maximum = 150.0f, fade_inverse = 0.1f;
+// popping. Make it proportional to what is actually visible:
+// length = clamp(min(L, X) * 0.25, 10, 150). X (view distance, [esp+0x20]) is
+// short in cut-scenes; a fade based on L alone started before the camera and
+// left nearby buildings half transparent there.
+inline float fade_fraction = 0.25f, fade_maximum = 150.0f, fade_minimum = 10.0f, fade_inverse = 0.1f;
 inline DWORD fade_continue = 0x53D1C0;
 inline bool fade_installed = false;
 
 __declspec(naked) inline void proportional_fade() {   // st0 = L
     __asm {
-        fld st(0)                       // L, L
-        fmul dword ptr [fade_fraction]  // len, L
-        fld dword ptr [fade_maximum]    // max, len, L
+        fld dword ptr [esp + 0x20]      // X, L
+        fld st(1)                       // L, X, L
+        fcomi st, st(1)
+        fcmovnb st, st(1)               // L >= X -> X: min(L, X), X, L
+        fmul dword ptr [fade_fraction]  // len, X, L
+        fld dword ptr [fade_maximum]    // max, len, X, L
         fcomi st, st(1)
         fcmovnb st, st(1)               // max >= len -> len
-        fstp st(1)                      // len, L
+        fstp st(1)                      // len, X, L
+        fld dword ptr [fade_minimum]    // min, len, X, L
+        fcomi st, st(1)
+        fcmovb st, st(1)                // min < len -> len
+        fstp st(1)                      // len, X, L
         fld1
-        fdiv st, st(1)                  // 1/len, len, L
-        fstp dword ptr [fade_inverse]   // len, L
-        fld dword ptr [esp + 0x20]      // X, len, L
-        fsubrp st(1), st                // X - len, L
+        fdiv st, st(1)                  // 1/len, len, X, L
+        fstp dword ptr [fade_inverse]   // len, X, L
+        fsubp st(1), st                 // X - len, L
         jmp dword ptr [fade_continue]
     }
 }
@@ -119,7 +128,7 @@ inline void install_fade() {
 inline void install(HMODULE self) {
     float scale = configured_scale(self);
     if (!(scale > 1.0f)) return;            // 1.0, invalid or "0": keep stock
-    if (scale > 7.0f) scale = 7.0f;         // 167*7 = 1169 < streaming pack radius 1200 (32 regions)
+    if (scale > 6.0f) scale = 6.0f;         // tested limit ("Alto"); 7.0 ("Ultra") could stall new games
     const ULONG_PTR base = reinterpret_cast<ULONG_PTR>(GetModuleHandleW(nullptr));
     if (base != 0x400000) return;           // offsets are for the stock image base
 

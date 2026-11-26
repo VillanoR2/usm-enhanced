@@ -20,7 +20,7 @@ Que hace
 - Filtro de fachadas de la ciudad (F6 lo activa/desactiva).
 - Pantalla: ventana, ventana sin bordes o pantalla completa, con la
   resolucion que elijas.
-- Distancia de dibujado ajustable (hasta x7) con aparicion gradual de los
+- Distancia de dibujado ajustable (hasta x6) con aparicion gradual de los
   objetos, 32 zonas de la ciudad cargadas en vez de 8 y USM.exe con hasta 4 GB
   de memoria.
 - Menos parpadeo lejano (plano cercano) y filtrado anisotropico hasta 16x.
@@ -39,7 +39,7 @@ Instalar
    juego suele estar en Archivos de programa). Si Windows SmartScreen avisa,
    pulsa "Mas informacion" > "Ejecutar de todas formas".
 3. Sigue los pasos de la ventana: encuentra el juego, analiza tu PC y te
-   recomienda un perfil (Basico, Equilibrado, Alto o Ultra). Puedes ajustar
+   recomienda un perfil (Basico, Equilibrado o Alto). Puedes ajustar
    distancia, peatones, trafico, pantalla y resolucion; cada opcion explica
    lo que hace.
 4. Abre el juego como siempre (o pulsa "Jugar ahora" al terminar).

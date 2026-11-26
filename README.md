@@ -64,7 +64,7 @@ Detalles para usuarios: [docs/LEEME.txt](docs/LEEME.txt).
 - Mandos DualSense, DualShock 4, Xbox y compatibles XInput, con la
   distribución de PS2 y los iconos de cada mando en los avisos; teclas
   dibujadas cuando se juega con teclado y ratón.
-- Distancia de dibujado hasta x7 con aparición gradual, 32 zonas de la ciudad
+- Distancia de dibujado hasta x6 con aparición gradual, 32 zonas de la ciudad
   cargadas (8 en el original), más peatones y tráfico apareciendo más lejos.
 - Ventana, ventana sin bordes o pantalla completa, con cualquier resolución.
 - Sombras y máscaras estilo PS2, filtrado anisotrópico y menos parpadeo lejano.

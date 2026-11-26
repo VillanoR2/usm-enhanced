@@ -501,6 +501,13 @@ Settings read_settings(const std::wstring& ini) {
     wchar_t resolution[24];
     GetPrivateProfileStringW(L"Graficos", L"Resolucion", L"auto", resolution, 24, ini.c_str());
     s.resolution = resolution;
+    // Tested limits ("Alto"); higher values ("Ultra") could stall new games.
+    auto clamp = [](auto value, auto low, auto high) { return value < low ? low : value > high ? high : value; };
+    s.draw_distance = clamp(s.draw_distance, 1.0, 6.0);
+    s.pedestrians = clamp(s.pedestrians, 10, 24);
+    s.traffic = clamp(s.traffic, 30, 45);
+    s.spawn_max = clamp(s.spawn_max, 90, 150);
+    s.spawn_min = clamp(s.spawn_min, 10, s.spawn_max - 20 < 60 ? s.spawn_max - 20 : 60);
     return s;
 }
 
@@ -644,18 +651,22 @@ void install(const std::wstring& game, const std::optional<std::wstring>& iso, b
         replace("(16 en vez de 8)", "(32 en vez de 8)");
         // v14: the draw distance limit moved from 3.5 to 7 (more regions loaded).
         replace("; 1.0 = original del juego, 3.0 = recomendado, maximo 3.5.",
-                "; 1.0 = original del juego, 6.0 = recomendado, maximo 7.0.");
+                "; 1.0 = original del juego, 6.0 = recomendado y maximo.");
         replace("DistanciaDibujado=3.0\r\n", "DistanciaDibujado=6.0\r\n");
+        // v1.0.2: "Ultra" removed; the mod caps values at "Alto" (6.0, 24, 45, 60-150 m).
+        replace("6.0 = recomendado, maximo 7.0.", "6.0 = recomendado y maximo.");
+        replace("recomendado 24, maximo 40.", "recomendado y maximo 24.");
+        replace("recomendado 45, maximo 60.", "recomendado y maximo 45.");
         if (has("RadioAparicionMinimo=45\r\n") && has("RadioAparicionMaximo=120\r\n")) {
             replace("Recomendado: 45 y 120.", "Recomendado: 60 y 150.");
             replace("RadioAparicionMinimo=45\r\n", "RadioAparicionMinimo=60\r\n");
             replace("RadioAparicionMaximo=120\r\n", "RadioAparicionMaximo=150\r\n");
         }
         if (!has("CantidadPeatones="))
-            text += "; Peatones simultaneos en la calle. Original 10, recomendado 24, maximo 40.\r\n"
+            text += "; Peatones simultaneos en la calle. Original 10, recomendado y maximo 24.\r\n"
                     "CantidadPeatones=24\r\n";
         if (!has("CantidadTrafico="))
-            text += "; Coches simultaneos. Original 30, recomendado 45, maximo 60.\r\n"
+            text += "; Coches simultaneos. Original 30, recomendado y maximo 45.\r\n"
                     "CantidadTrafico=45\r\n";
         write_file(ini, Bytes(text.begin(), text.end()));
     }

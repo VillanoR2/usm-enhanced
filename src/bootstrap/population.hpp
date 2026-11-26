@@ -8,8 +8,9 @@ namespace population {
 
 inline void install(float minimum, float maximum) {
     if (!(maximum >= 90.0f)) maximum = 90.0f;
-    if (maximum > 200.0f) maximum = 200.0f;
+    if (maximum > 150.0f) maximum = 150.0f;  // tested limit ("Alto")
     if (!(minimum >= 10.0f)) minimum = 10.0f;
+    if (minimum > 60.0f) minimum = 60.0f;
     if (minimum > maximum - 20.0f) minimum = maximum - 20.0f;
     if (minimum == 10.0f && maximum == 90.0f) return;  // stock
 
@@ -48,9 +49,9 @@ inline void install_counts(float pedestrians, float cars) {
         return;
     }
     BYTE ped = 10;
-    while (ped < 40 && static_cast<float>(ped + 1) <= pedestrians) ++ped;
+    while (ped < 24 && static_cast<float>(ped + 1) <= pedestrians) ++ped;  // tested limit ("Alto")
     DWORD car = 30;
-    while (car < 60 && static_cast<float>(car + 1) <= cars) ++car;
+    while (car < 45 && static_cast<float>(car + 1) <= cars) ++car;    // tested limit ("Alto")
     if (ped != 10) draw_distance::write(0x6D1A9A, &ped, 1);
     if (car != 30) {
         const DWORD last = car - 1;

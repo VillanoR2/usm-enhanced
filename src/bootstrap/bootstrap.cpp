@@ -6,6 +6,7 @@
 #include "population.hpp"
 #include "streaming.hpp"
 #include "stability.hpp"
+#include "frame_rate.hpp"
 #include "d3d9_refresh.hpp"
 
 extern "C" int _fltused = 0;  // no CRT: floating point is used by draw_distance
@@ -251,8 +252,12 @@ extern "C" BOOL WINAPI DllMain(HINSTANCE module, DWORD reason, LPVOID) {
         draw_distance::install(module);
         streaming::grow_pools();
         stability::install();
+        frame_rate::install(draw_distance::setting(module, L"FPSMaximo", L"USM_PC_FPS", L"60"));
         depth_fix::log_line(draw_distance::fade_installed ? "draw distance: proportional fade installed"
                                                           : "draw distance: stock fade kept");
+        depth_fix::log_line(frame_rate::installed ? (frame_rate::configured > 59.5f ? "frame rate: 60 FPS"
+                                                                                     : "frame rate: custom FPS")
+                                                  : "frame rate: stock 30 FPS");
         if (draw_distance::setting(module, L"AmpliarCarga", L"USM_PC_STREAMING", L"1") >= 1.0f)
             streaming::install(draw_distance::applied_scale);
         depth_fix::install(draw_distance::setting(module, L"PlanoCercano", L"USM_PC_NEAR_PLANE", L"0.3"));

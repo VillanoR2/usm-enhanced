@@ -60,11 +60,12 @@ Hardware detect_hardware() {
 }
 
 struct Preset { const wchar_t* name; const wchar_t* who; Settings values; };
+// "Ultra" (7.0, 32 pedestrians, 55 cars, 70-170 m) was removed: it left new games
+// stuck on the first loading screen on some PCs. Every setting is capped at "Alto".
 const Preset kPresets[] = {
     {L"Básico", L"PC antiguo o portátil sencillo",      {2.0, 0.3, 4, 30, 100, false, 12, 30}},
     {L"Equilibrado", L"PC de gama media",                {4.0, 0.3, 8, 50, 130, true, 18, 38}},
     {L"Alto", L"PC moderno (recomendado)",              {6.0, 0.3, 16, 60, 150, true, 24, 45}},
-    {L"Ultra", L"PC potente con mucha memoria",          {7.0, 0.3, 16, 70, 170, true, 32, 55}},
 };
 
 bool same_settings(const Settings& a, const Settings& b) {
@@ -75,7 +76,6 @@ bool same_settings(const Settings& a, const Settings& b) {
 }
 
 int recommended_preset(const Hardware& h) {
-    if (h.ram_gb >= 15 && h.cores >= 8 && h.vram_gb >= 4) return 3;
     if (h.ram_gb >= 7.5 && h.cores >= 4 && h.vram_gb >= 1.5) return 2;
     if (h.ram_gb >= 3.5 && h.cores >= 2) return 1;
     return 0;
@@ -135,7 +135,8 @@ constexpr Page kAll = kPageCount;  // shown on every page
 HWND back_button, next_button, cancel_button;
 HWND mode_install, mode_settings, mode_uninstall, welcome_text;
 HWND game_edit, game_status, edition_label, iso_edit, iso_label, iso_browse, iso_help, spanish_box;
-HWND preset_buttons[4], recommended_label, streaming_box, help_box, screen_combo, resolution_combo;
+constexpr int kPresetCount = static_cast<int>(sizeof(kPresets) / sizeof(kPresets[0]));
+HWND preset_buttons[kPresetCount], recommended_label, streaming_box, help_box, screen_combo, resolution_combo;
 
 // Resolutions the primary monitor supports (largest first), as "WIDTHxHEIGHT".
 std::vector<std::wstring> display_modes() {
@@ -163,19 +164,19 @@ struct Slider {
     HWND bar = nullptr, value = nullptr;
 };
 Slider sliders[] = {
-    {L"Distancia de dibujado", 10, 70, 5, 0.1, L"x",
+    {L"Distancia de dibujado", 10, 60, 5, 0.1, L"x",
      L"Distancia de dibujado: hasta donde se ven edificios, personajes, coches y objetos. 1.0 es la del juego "
      L"original; 6.0 deja ver la ciudad desde las azoteas. Valores altos piden más a la tarjeta gráfica."},
-    {L"Peatones", 10, 40, 1, 1, L"",
+    {L"Peatones", 10, 24, 1, 1, L"",
      L"Peatones: cuanta gente camina por las calles a la vez. El original tiene 10. Más gente da vida a la "
      L"ciudad pero usa más procesador."},
-    {L"Tráfico", 30, 60, 1, 1, L"coches",
+    {L"Tráfico", 30, 45, 1, 1, L"coches",
      L"Tráfico: coches circulando a la vez. El original tiene 30. Más coches llenan las avenidas pero usan "
      L"más procesador."},
-    {L"Aparición mínima", 10, 100, 5, 1, L"m",
+    {L"Aparición mínima", 10, 60, 5, 1, L"m",
      L"Aparición mínima: distancia mínima a la que se crean peatones y coches. Más alta evita que surjan "
      L"delante de Spider-Man."},
-    {L"Aparición máxima", 90, 200, 5, 1, L"m",
+    {L"Aparición máxima", 90, 150, 5, 1, L"m",
      L"Aparición máxima: radio hasta el que hay peatones y coches; más allá desaparecen. Más alto mantiene "
      L"las calles llenas a lo lejos."},
     {L"Filtrado de texturas", 0, 4, 1, 1, L"",
@@ -240,7 +241,7 @@ void sync_settings_controls() {
     if (found == CB_ERR && state.settings.resolution != L"auto" && !state.settings.resolution.empty())
         found = SendMessageW(resolution_combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(state.settings.resolution.c_str()));
     SendMessageW(resolution_combo, CB_SETCURSEL, found == CB_ERR ? 0 : static_cast<WPARAM>(found), 0);
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < kPresetCount; ++i)
         SendMessageW(preset_buttons[i], BM_SETCHECK, i == state.preset ? BST_CHECKED : BST_UNCHECKED, 0);
 }
 
@@ -574,9 +575,9 @@ void build() {
 
     // Settings: presets.
     add(kSettings, L"STATIC", L"Perfil", SS_LEFT, x, 106, 60, 22, 0, font_bold);
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < kPresetCount; ++i)
         preset_buttons[i] = add(kSettings, L"BUTTON", kPresets[i].name, WS_TABSTOP | BS_AUTORADIOBUTTON | BS_PUSHLIKE |
-                                (i == 0 ? WS_GROUP : 0), x + 60 + i * 132, 102, 126, 30, ID_PRESET0 + i);
+                                (i == 0 ? WS_GROUP : 0), x + 60 + i * 176, 102, 170, 30, ID_PRESET0 + i);
     recommended_label = add(kSettings, L"STATIC", L"", SS_LEFT, x, 136, w, 20, 0, font_small);
     // Settings: sliders in two columns.
     for (int i = 0; i < static_cast<int>(std::size(sliders)); ++i) {
@@ -711,7 +712,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
             const std::wstring path = pick(false);
             if (!path.empty()) SetWindowTextW(iso_edit, path.c_str());
         }
-        if (id >= ID_PRESET0 && id <= ID_PRESET3) choose_preset(id - ID_PRESET0);
+        if (id >= ID_PRESET0 && id < ID_PRESET0 + kPresetCount) choose_preset(id - ID_PRESET0);
         if (id == ID_SCREEN && HIWORD(wparam) == CBN_SELCHANGE) {
             state.settings.screen_mode = static_cast<int>(SendMessageW(screen_combo, CB_GETCURSEL, 0, 0));
             static const wchar_t* const help[] = {
@@ -759,7 +760,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
                     // Start from the values already in use.
                     state.settings = read_settings(state.game + L"\\usm_mod.ini");
                     state.preset = -1;
-                    for (int i = 0; i < 4; ++i)
+                    for (int i = 0; i < kPresetCount; ++i)
                         if (same_settings(kPresets[i].values, state.settings)) state.preset = i;
                 }
                 wchar_t iso[MAX_PATH] = {};

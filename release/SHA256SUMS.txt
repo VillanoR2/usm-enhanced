@@ -1,6 +1,6 @@
-64bbe6b5b21d364b50c8039c491573b56d012bc78b3333ac6d91b76dd577d5f4  USM-PC-Mod/archivos/binkw32.dll
-442908b732decaf01bcd99c4d26e8f64db55e6ada86eb211d2c1a1987cfc56ac  USM-PC-Mod/archivos/usm_native_input.dll
-43116b9eb5f8a2665e78b2d2db46de2ca4e5b46f0a3c1cfbd29cdf3d6c1abb49  USM-PC-Mod/Instalar-USM-Mod.exe
-35055d6e2f5d6f257130ba03894d2d05661d355198a34f547cf1f24a49fde678  USM-PC-Mod/LEEME.txt
+741c2ad61c80c028c6d93fb476236424b3a5557762e9c1b8198ea07fd9e12a4e  USM-PC-Mod/archivos/binkw32.dll
+3ad777dd80c065fbe0c7cdf8c795796927f9abf2d5d3cc130c362dcbcbc3898d  USM-PC-Mod/archivos/usm_native_input.dll
+8227dd77888cb9b15aded1c4ab869dc9ef372dd5e1c9dc13826ffbf2c08bedb2  USM-PC-Mod/Instalar-USM-Mod.exe
+0fd47d6860845d45a1f5d77fd5a8a6ad857166f85b0f7a473211ed9a0d2fb968  USM-PC-Mod/LEEME.txt
 3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986  USM-PC-Mod/LICENSE.txt
 3136e947da9d169357f314f6adb83fa83d47dd7ebb791feb94e16489a5ceeaef  USM-PC-Mod/TERCEROS.txt

@@ -240,11 +240,14 @@ public:
         }
         if (presentation) {
             char line[160];
-            wsprintfA(line, "CreateDevice hr=%08lx depth_requested=%d depth_used=%d auto=%d %ux%u windowed=%d",
+            wsprintfA(line, "CreateDevice hr=%08lx depth_requested=%d depth_used=%d auto=%d %ux%u windowed=%d "
+                      "interval=%lx refresh=%u",
                       static_cast<unsigned long>(hr), static_cast<int>(requested_depth),
                       static_cast<int>(presentation->AutoDepthStencilFormat),
                       static_cast<int>(presentation->EnableAutoDepthStencil), presentation->BackBufferWidth,
-                      presentation->BackBufferHeight, static_cast<int>(presentation->Windowed));
+                      presentation->BackBufferHeight, static_cast<int>(presentation->Windowed),
+                      static_cast<unsigned long>(presentation->PresentationInterval),
+                      presentation->FullScreen_RefreshRateInHz);
             depth_fix::log_line(line);
         }
         if (adjust && FAILED(hr)) presentation->FullScreen_RefreshRateInHz = 60;
