@@ -1,0 +1,3 @@
+LIBRARY usm_native_input
+EXPORTS
+    DirectInput8Create=_DirectInput8Create@20

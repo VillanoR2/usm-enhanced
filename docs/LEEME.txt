@@ -1,0 +1,60 @@
+Ultimate Spider-Man (PC) - Mod
+==============================
+
+Este paquete NO incluye ningun archivo del juego. Necesitas tu propia copia
+de Ultimate Spider-Man para PC (version 1.0) ya instalada.
+
+Que hace
+- Voces en ingles con textos en espanol.
+- Mandos: DualSense, DualShock 4, Xbox One / Series y cualquier otro
+  compatible con XInput, con la distribucion de PS2: panel tactil (View en
+  Xbox) = mapa aereo, R3 = fijar camara, Options/Menu = pausa.
+- Iconos de botones en todos los avisos segun lo que uses: DualSense
+  (simbolos de PS5), DualShock (simbolos de colores como en PS2), Xbox y otros
+  mandos (botones de Xbox One), teclado y raton (teclas dibujadas). Siguen tus
+  asignaciones del menu de controles.
+- Sombras y mascaras estilo PS2 (tambien en el traje). Sin ISO se usan unas
+  generadas por el mod; con tu propia ISO de PS2, las originales.
+- Filtro de fachadas de la ciudad (F6 lo activa/desactiva).
+- Pantalla: ventana, ventana sin bordes o pantalla completa, con la
+  resolucion que elijas.
+- Distancia de dibujado ajustable (hasta x7) con aparicion gradual de los
+  objetos, 32 zonas de la ciudad cargadas en vez de 8 y USM.exe con hasta 4 GB
+  de memoria.
+- Menos parpadeo lejano (plano cercano) y filtrado anisotropico hasta 16x.
+- Peatones y trafico ajustables y apareciendo mas lejos.
+- Correcciones de estabilidad para las distancias y multitudes mayores.
+
+Requisitos
+- Ultimate Spider-Man para PC, version 1.0, ya instalado.
+- Opcional: tu propia ISO de Ultimate Spider-Man de PS2, solo si quieres las
+  texturas originales de sombras y mascaras. El instalador la lee una vez, no
+  la modifica y no la copia a ningun otro sitio.
+
+Instalar
+1. Descomprime el ZIP en cualquier carpeta.
+2. Ejecuta Instalar-USM-Mod.exe (pedira permiso de administrador porque el
+   juego suele estar en Archivos de programa). Si Windows SmartScreen avisa,
+   pulsa "Mas informacion" > "Ejecutar de todas formas".
+3. Sigue los pasos de la ventana: encuentra el juego, analiza tu PC y te
+   recomienda un perfil (Basico, Equilibrado, Alto o Ultra). Puedes ajustar
+   distancia, peatones, trafico, pantalla y resolucion; cada opcion explica
+   lo que hace.
+4. Abre el juego como siempre (o pulsa "Jugar ahora" al terminar).
+
+Cambiar ajustes o desinstalar
+- Vuelve a abrir Instalar-USM-Mod.exe y elige "Cambiar solo los ajustes" o
+  "Desinstalar". Al desinstalar se restauran USM.exe y binkw32.dll originales
+  desde las copias que guarda el instalador. Las partidas no se tocan.
+
+Opciones de linea de comandos (sin ventana)
+  --juego "carpeta"   --iso "archivo.iso"   --sin-iso
+  --texto-original    (solo voces en ingles, textos originales)
+  --desinstalar
+
+Licencias y creditos
+- Codigo del mod: GPL-3.0 (LICENSE.txt).
+- Distancia de dibujado y ampliacion de carga: basadas en
+  UltimateSpiderMan.FusionFix de ThirteenAG (WidescreenFixesPack, GPL-3.0).
+- Iconos de mandos: "Input Prompts" de Kenney (www.kenney.nl), CC0.
+- Detalles en TERCEROS.txt.

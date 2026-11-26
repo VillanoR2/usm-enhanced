@@ -1,0 +1,10 @@
+LIBRARY binkw32
+EXPORTS
+    _BinkClose@4=binkw32_original._BinkClose@4 @16
+    _BinkCopyToBuffer@28=binkw32_original._BinkCopyToBuffer@28 @18
+    _BinkDoFrame@4=binkw32_original._BinkDoFrame@4 @23
+    _BinkNextFrame@4=binkw32_original._BinkNextFrame@4 @37
+    _BinkOpen@8=binkw32_original._BinkOpen@8 @38
+    _BinkOpenDirectSound@4=binkw32_original._BinkOpenDirectSound@4 @39
+    _BinkSetSoundSystem@8=binkw32_original._BinkSetSoundSystem@8 @57
+    _BinkWait@4=binkw32_original._BinkWait@4 @61
