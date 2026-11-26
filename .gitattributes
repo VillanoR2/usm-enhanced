@@ -12,3 +12,4 @@ LICENSE text eol=lf
 *.dll binary
 *.exe binary
 *.zip binary
+release/** -text
