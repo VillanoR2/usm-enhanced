@@ -58,7 +58,9 @@ Detalles para usuarios: [docs/LEEME.txt](docs/LEEME.txt).
 
 ## Qué incluye
 
-- Voces en inglés con textos en español (o textos originales).
+- Voces en inglés con textos en español (o textos originales). El instalador
+  detecta si tu copia es la edición solo en inglés o la multilingüe y aplica
+  únicamente lo que tus archivos permiten.
 - Mandos DualSense, DualShock 4, Xbox y compatibles XInput, con la
   distribución de PS2 y los iconos de cada mando en los avisos; teclas
   dibujadas cuando se juega con teclado y ratón.

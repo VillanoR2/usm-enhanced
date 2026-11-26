@@ -93,6 +93,7 @@ struct State {
     Mode mode = kInstall;
     std::wstring game;
     bool game_ok = false, installed = false;
+    Edition edition;
     std::wstring iso;
     bool spanish = true;
     Settings settings;
@@ -133,7 +134,7 @@ constexpr Page kAll = kPageCount;  // shown on every page
 
 HWND back_button, next_button, cancel_button;
 HWND mode_install, mode_settings, mode_uninstall, welcome_text;
-HWND game_edit, game_status, iso_edit, iso_label, iso_browse, iso_help, spanish_box;
+HWND game_edit, game_status, edition_label, iso_edit, iso_label, iso_browse, iso_help, spanish_box;
 HWND preset_buttons[4], recommended_label, streaming_box, help_box, screen_combo, resolution_combo;
 
 // Resolutions the primary monitor supports (largest first), as "WIDTHxHEIGHT".
@@ -254,6 +255,19 @@ void check_game() {
     else if (state.installed) state.status_line = L"Juego encontrado. El mod ya está instalado: se actualizará.";
     else state.status_line = L"Juego encontrado. Se guardarán copias de los archivos originales.";
     SetWindowTextW(game_status, state.status_line.c_str());
+    // Edition: which voices and texts this copy really has.
+    state.edition = state.game_ok ? scan_edition(state.game) : Edition{};
+    std::wstring edition_text;
+    if (state.game_ok) {
+        edition_text = state.edition.label + L".";
+        if (!state.edition.spanish_text) edition_text += L" No incluye textos en español: se mantendrán los originales.";
+        if (!state.edition.english_voices) edition_text += L" No incluye voces en inglés: se mantendrán las originales.";
+    }
+    SetWindowTextW(edition_label, edition_text.c_str());
+    EnableWindow(spanish_box, state.edition.spanish_text);
+    if (!state.edition.spanish_text) SendMessageW(spanish_box, BM_SETCHECK, BST_UNCHECKED, 0);
+    SetWindowTextW(spanish_box, state.edition.english_voices ? L"Textos en español (las voces quedan en inglés)"
+                                                              : L"Textos en español");
     InvalidateRect(game_status, nullptr, TRUE);
     EnableWindow(mode_settings, state.installed);
     EnableWindow(mode_uninstall, state.installed);
@@ -311,7 +325,8 @@ std::wstring confirm_summary() {
         t = L"Se instalará el mod en:\r\n    " + state.game + L"\r\n\r\n";
         t += state.installed ? L"  -  Actualización: se conservan tus copias originales.\r\n"
                              : L"  -  Copias de seguridad: USM.exe.mod-backup y binkw32_original.dll.\r\n";
-        t += state.spanish ? L"  -  Voces en inglés y textos en español.\r\n" : L"  -  Voces en inglés, textos originales.\r\n";
+        t += state.edition.english_voices ? L"  -  Voces en inglés" : L"  -  Voces originales de tu edición";
+        t += state.spanish && state.edition.spanish_text ? L" y textos en español.\r\n" : L", textos originales.\r\n";
         t += L"  -  Mandos DualSense, DualShock 4 y Xbox con sus iconos; iconos de teclado y raton.\r\n";
         t += state.iso.empty() ? L"  -  Sombras y máscaras estilo PS2 generadas por el mod (sin ISO).\r\n"
                                : L"  -  Sombras y máscaras originales de PS2 extraidas de tu ISO.\r\n";
@@ -546,14 +561,15 @@ void build() {
     game_edit = add(kGame, L"EDIT", state.game.c_str(), WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x, 138, w - 120, 28, ID_GAME_EDIT);
     add(kGame, L"BUTTON", L"Examinar...", WS_TABSTOP | BS_PUSHBUTTON, x + w - 110, 137, 110, 30, ID_GAME_BROWSE);
     game_status = add(kGame, L"STATIC", L"", SS_LEFT, x, 172, w, 22);
-    iso_label = add(kGame, L"STATIC", L"ISO de Ultimate Spider-Man para PS2 (opcional)", SS_LEFT, x, 214, w, 22, 0, font_bold);
-    iso_edit = add(kGame, L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x, 240, w - 120, 28, ID_ISO_EDIT);
-    iso_browse = add(kGame, L"BUTTON", L"Examinar...", WS_TABSTOP | BS_PUSHBUTTON, x + w - 110, 239, 110, 30, ID_ISO_BROWSE);
+    edition_label = add(kGame, L"STATIC", L"", SS_LEFT, x, 194, w, 38, 0, font_small);
+    iso_label = add(kGame, L"STATIC", L"ISO de Ultimate Spider-Man para PS2 (opcional)", SS_LEFT, x, 240, w, 22, 0, font_bold);
+    iso_edit = add(kGame, L"EDIT", L"", WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, x, 266, w - 120, 28, ID_ISO_EDIT);
+    iso_browse = add(kGame, L"BUTTON", L"Examinar...", WS_TABSTOP | BS_PUSHBUTTON, x + w - 110, 265, 110, 30, ID_ISO_BROWSE);
     iso_help = add(kGame, L"STATIC",
         L"Solo si quieres las texturas originales de PS2 para sombras y máscaras. Sin ISO, el mod usa unas "
-        L"propias muy parecidas. La ISO se lee una vez y no se modifica.", SS_LEFT, x, 274, w, 44, 0, font_small);
+        L"propias muy parecidas. La ISO se lee una vez y no se modifica.", SS_LEFT, x, 300, w, 44, 0, font_small);
     spanish_box = add(kGame, L"BUTTON", L"Textos en español (las voces quedan en inglés)",
-                      WS_TABSTOP | BS_AUTOCHECKBOX, x, 336, w, 26, ID_SPANISH);
+                      WS_TABSTOP | BS_AUTOCHECKBOX, x, 362, w, 26, ID_SPANISH);
     SendMessageW(spanish_box, BM_SETCHECK, BST_CHECKED, 0);
 
     // Settings: presets.
@@ -662,7 +678,8 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
         HWND control = reinterpret_cast<HWND>(lparam);
         SetBkMode(dc, TRANSPARENT);
         SetTextColor(dc, control == game_status ? (state.game_ok ? kGood : kBad)
-                         : control == help_box || control == iso_help || control == recommended_label ? kMuted : kText);
+                         : control == help_box || control == iso_help || control == recommended_label || control == edition_label
+                             ? kMuted : kText);
         if (control == help_box) { SetBkColor(dc, kPanel); return reinterpret_cast<LRESULT>(brush_panel); }
         SetBkColor(dc, kPage);
         return reinterpret_cast<LRESULT>(brush_page);

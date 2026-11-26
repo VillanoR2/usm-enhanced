@@ -504,6 +504,43 @@ Settings read_settings(const std::wstring& ini) {
     return s;
 }
 
+// Which languages this copy of the game really contains. Editions differ: the
+// European one ships voices EN/SP/FR/IT and text in five languages, the US one
+// English only. Forcing a language whose files are missing leaves the game
+// stuck on the first loading screen, so each patch depends on its files.
+struct Edition {
+    std::vector<std::wstring> voices, texts;   // e.g. {L"EN", L"SP"} / {L"inglés", L"español"}
+    bool english_voices = false, spanish_text = false;
+    std::wstring label;
+};
+
+Edition scan_edition(const std::wstring& game) {
+    Edition e;
+    const std::wstring streams = game + L"\\Data\\sound\\pc\\STREAMS\\";
+    for (const wchar_t* code : {L"EN", L"SP", L"FR", L"IT", L"GE"})
+        if (exists(streams + L"STREAMS_VOICE_" + code + L".WBK") && exists(streams + L"STREAMS_SCENE_" + code + L".WBK"))
+            e.voices.push_back(code);
+    struct Text { const wchar_t* pack; const wchar_t* table; const wchar_t* name; };
+    const Text texts[] = {{L"ENGLISH", L"e", L"inglés"}, {L"SPANISH", L"s", L"español"}, {L"FRENCH", L"f", L"francés"},
+                          {L"GERMAN", L"g", L"alemán"}, {L"ITALIAN", L"i", L"italiano"}};
+    for (const Text& t : texts)
+        if (exists(game + L"\\Data\\packs\\pc\\GLOBALTEXT_" + t.pack + L".PCPACK") &&
+            exists(game + L"\\Data\\usm_lt" + t.table + L".usm"))
+            e.texts.push_back(t.name);
+    e.english_voices = std::find(e.voices.begin(), e.voices.end(), L"EN") != e.voices.end();
+    e.spanish_text = std::find(e.texts.begin(), e.texts.end(), L"español") != e.texts.end();
+    auto join = [](const std::vector<std::wstring>& list) {
+        std::wstring out;
+        for (const auto& item : list) out += (out.empty() ? L"" : L", ") + item;
+        return out.empty() ? std::wstring(L"ninguno reconocido") : out;
+    };
+    if (e.voices.size() <= 1 && e.texts.size() <= 1)
+        e.label = L"Edición de un idioma (voces: " + join(e.voices) + L"; textos: " + join(e.texts) + L")";
+    else
+        e.label = L"Edición multilingüe (voces: " + join(e.voices) + L"; textos: " + join(e.texts) + L")";
+    return e;
+}
+
 void install(const std::wstring& game, const std::optional<std::wstring>& iso, bool spanish_text,
              const Settings* settings = nullptr) {
     step(5, L"Comprobando la instalación del juego");
@@ -527,8 +564,19 @@ void install(const std::wstring& game, const std::optional<std::wstring>& iso, b
         write_file(game + L"\\" + ORIGINAL_BINK, bink);
     }
     step(35, L"Parcheando USM.exe (voces, textos y memoria)");
+    const Edition edition = scan_edition(game);
+    say(edition.label + L".\n");
     for (const Patch& p : PATCHES) {
-        if (p.optional_text && !spanish_text) continue;
+        if (p.optional_text) {
+            if (!spanish_text) continue;
+            if (!edition.spanish_text) {
+                say(L"Esta edición no trae los textos en español: se mantienen los textos originales.\n");
+                continue;
+            }
+        } else if (!edition.english_voices) {
+            say(L"Esta edición no trae las voces en inglés: se mantienen las voces originales.\n");
+            continue;
+        }
         const Bytes after = hex(p.after);
         std::copy(after.begin(), after.end(), original.begin() + exe_offset(p.va));
     }
@@ -623,9 +671,10 @@ void install(const std::wstring& game, const std::optional<std::wstring>& iso, b
     std::ofstream marker(game + L"\\" + MARKER, std::ios::trunc);
     marker << "USM PC mod v1 instalado. Para quitarlo ejecuta el instalador y elige desinstalar.\n";
 
-    say(L"\nInstalado en " + game + L"\n"
-        L"  - Voces en inglés" + std::wstring(spanish_text ? L", textos en español\n" : L"\n") +
-        L"  - Mandos DualSense, DualShock 4 y Xbox, ventana 1280x720, filtro de ciudad (F6)\n"
+    say(L"\nInstalado en " + game + L"\n" +
+        std::wstring(edition.english_voices ? L"  - Voces en inglés" : L"  - Voces originales de tu edición") +
+        std::wstring(spanish_text && edition.spanish_text ? L", textos en español\n" : L", textos originales\n") +
+        L"  - Mandos DualSense, DualShock 4 y Xbox, filtro de ciudad (F6)\n"
         L"  - Distancia de dibujado, zonas cargadas, peatones y tráfico según tus ajustes\n"
         L"  - Iconos de botones: teclado y raton, DualSense, DualShock y Xbox\n");
     say(assets == 2 ? L"  - Sombras y máscaras estilo PS2 (desde tu ISO)\n"

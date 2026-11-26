@@ -5,7 +5,9 @@ Este paquete NO incluye ningun archivo del juego. Necesitas tu propia copia
 de Ultimate Spider-Man para PC (version 1.0) ya instalada.
 
 Que hace
-- Voces en ingles con textos en espanol.
+- Voces en ingles con textos en espanol. El instalador detecta tu edicion
+  (solo ingles o multilingue) y solo aplica lo que tu copia incluye: en la
+  edicion solo en ingles los textos se quedan en ingles.
 - Mandos: DualSense, DualShock 4, Xbox One / Series y cualquier otro
   compatible con XInput, con la distribucion de PS2: panel tactil (View en
   Xbox) = mapa aereo, R3 = fijar camara, Options/Menu = pausa.

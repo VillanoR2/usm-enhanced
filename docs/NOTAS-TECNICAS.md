@@ -23,6 +23,13 @@ aplica y se anota en `%TEMP%\usm_mod.log`.
 | 0x62EF5E | Textos en español sin depender del idioma de voces (opcional). |
 | Cabecera PE | `LARGE_ADDRESS_AWARE` (hasta 4 GB en Windows de 64 bits). |
 
+Antes de parchear, el instalador revisa qué idiomas trae la copia: voces en
+`Data\sound\pc\STREAMS\STREAMS_VOICE_XX.WBK` y textos en
+`Data\packs\pc\GLOBALTEXT_<IDIOMA>.PCPACK` + `Data\usm_lt?.usm`. Forzar un idioma
+cuyos archivos faltan deja el juego parado en la primera pantalla de carga, así
+que cada parche solo se aplica si sus archivos existen (la edición de EE. UU.
+solo trae inglés).
+
 ## Distancia y carga (`draw_distance.hpp`, `streaming.hpp`)
 
 - Tablas de distancia por clase 0x921E48 / 0x921E88: se dejan intactas (las
